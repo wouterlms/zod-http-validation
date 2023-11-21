@@ -27,21 +27,21 @@ interface GetOptions<T extends z.ZodType> {
 
 interface PostOptions<T extends z.ZodType> {
   url: string
-  data: any
+  body: any
   responseSchema: T
   config?: AxiosRequestConfig<any>
 }
 
 interface PutOptions<T extends z.ZodType> {
   url: string
-  data: any
+  body: any
   responseSchema: T
   config?: AxiosRequestConfig<any>
 }
 
 interface DeleteOptions<T extends z.ZodType> {
   url: string
-  data?: any
+  body?: any
   responseSchema?: T
   config?: AxiosRequestConfig<any>
 }
@@ -75,15 +75,15 @@ export function createHttpZodClient(
   const post = async <T extends z.ZodType>(options: PostOptions<T>) => {
     const {
       url,
-      data,
+      body,
       config,
       responseSchema,
     } = options
 
-    const { data: responseData } = await axios.post(url, data, config)
+    const { data } = await axios.post(url, body, config)
 
     try {
-      return responseSchema.parse(responseData)
+      return responseSchema.parse(data)
     }
     catch (error) {
       if (error instanceof z.ZodError) {
@@ -93,7 +93,7 @@ export function createHttpZodClient(
           error,
         })
 
-        return responseData
+        return data
       }
 
       throw error
@@ -103,15 +103,15 @@ export function createHttpZodClient(
   const put = async <T extends z.ZodType>(options: PutOptions<T>) => {
     const {
       url,
-      data,
+      body,
       config,
       responseSchema,
     } = options
 
-    const { data: responseData } = await axios.put(url, data, config)
+    const { data } = await axios.put(url, body, config)
 
     try {
-      return responseSchema.parse(responseData)
+      return responseSchema.parse(data)
     }
     catch (error) {
       if (error instanceof z.ZodError) {
@@ -121,7 +121,7 @@ export function createHttpZodClient(
           error,
         })
 
-        return responseData
+        return data
       }
 
       throw error
@@ -132,20 +132,20 @@ export function createHttpZodClient(
     const {
       url,
       config,
-      data,
+      body,
       responseSchema,
     } = options
 
-    const { data: responseData } = await axios.delete(url, {
+    const { data } = await axios.delete(url, {
       ...(config ?? {}),
-      data,
+      data: body,
     })
 
     if (!responseSchema)
       return
 
     try {
-      return responseSchema.parse(responseData)
+      return responseSchema.parse(data)
     }
     catch (error) {
       if (error instanceof z.ZodError) {
@@ -155,7 +155,7 @@ export function createHttpZodClient(
           error,
         })
 
-        return responseData
+        return data
       }
 
       throw error
